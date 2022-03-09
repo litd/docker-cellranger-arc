@@ -1,0 +1,38 @@
+###################################################
+### Dockerfile for 10X Genomics Cell Ranger ARC ###
+###################################################
+
+# Based on
+FROM centos:8
+
+# File Author / Maintainer
+MAINTAINER Tiandao Li <litd99@gmail.com>
+
+# centos end of life (EOL)
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+
+# Install some utilities
+RUN yum install -y \
+	file \
+	git \
+	sssd-client \
+	which \
+	wget \
+	unzip
+
+# Install bcl2fastq
+RUN cd /tmp/ && \
+	wget http://regmedsrv1.wustl.edu/Public_SPACE/litd/Public_html/pkg/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && \
+	yum -y --nogpgcheck localinstall bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && \
+	rm -rf bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm
+ 	
+# Install cellranger-arc
+RUN cd /opt/ && \
+	wget http://regmedsrv1.wustl.edu/Public_SPACE/litd/Public_html/pkg/cellranger-arc-2.0.1.tar.gz && \	
+	tar -xzvf cellranger-arc-2.0.1.tar.gz && \
+	rm -f cellranger-arc-2.0.1.tar.gz
+
+# path
+ENV PATH /opt/cellranger-arc-2.0.1:$PATH
+
